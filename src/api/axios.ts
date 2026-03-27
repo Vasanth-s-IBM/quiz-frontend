@@ -21,20 +21,65 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor – handle auth errors
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: any) => void }> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) prom.reject(error);
+    else prom.resolve(token!);
+  });
+  failedQueue = [];
+};
+
+// Response interceptor – handle 401 with token refresh
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const status = error.response?.status;
     const url = error.config?.url;
+    const originalRequest = error.config;
 
-    // 🔥 IMPORTANT: allow login errors to be handled in UI
-    // Only hard-redirect on 401 for non-login requests
-    if (status === 401 && !url?.includes('/auth/login')) {
-      localStorage.clear();
-      // Use replace so the user can't go back to the broken page
-      window.location.replace('/login');
-      return new Promise(() => {}); // prevent further .catch() handling
+    // Skip refresh logic for login/refresh endpoints
+    if (status === 401 && !url?.includes('/auth/login') && !url?.includes('/auth/refresh')) {
+      if (isRefreshing) {
+        // Queue requests while refresh is in progress
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return axiosInstance(originalRequest);
+        });
+      }
+
+      isRefreshing = true;
+      const refreshToken = localStorage.getItem('refreshToken');
+
+      if (!refreshToken) {
+        localStorage.clear();
+        window.location.replace('/login');
+        return new Promise(() => {});
+      }
+
+      try {
+        const { data } = await axiosInstance.post('/auth/refresh', { refresh_token: refreshToken });
+
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('refreshToken', data.refresh_token);
+
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
+        originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
+
+        processQueue(null, data.access_token);
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        localStorage.clear();
+        window.location.replace('/login');
+        return new Promise(() => {});
+      } finally {
+        isRefreshing = false;
+      }
     }
 
     return Promise.reject(error);
