@@ -57,6 +57,19 @@ export const adminAPI = {
   getResults: () => axiosInstance.get('/admin/results'),
   getUserResults: (userId: number) =>
     axiosInstance.get(`/admin/results/user/${userId}`),
+  updateCertificateStatus: (scoreId: number, status: string) =>
+    axiosInstance.put(`/admin/results/${scoreId}/status`, { status }),
+  getProctoringConfig: () => axiosInstance.get('/admin/proctor-config'),
+  updateProctoringConfig: (data: any) => axiosInstance.put('/admin/proctor-config', data),
+};
+
+/* =====================
+   USER APIs
+   ===================== */
+export const userAPI = {
+  getProfile: () => axiosInstance.get('/user/profile'),
+  downloadCertificate: (scoreId: number) =>
+    axiosInstance.get(`/user/certificate/download/${scoreId}`, { responseType: 'blob' }),
 };
 
 /* =====================
@@ -65,4 +78,11 @@ export const adminAPI = {
 export const certificateAPI = {
   publish: (user_score_id: number) =>
     axiosInstance.post('/certificate/publish', { user_score_id }),
+};
+
+/* =====================
+   PROCTOR APIs
+   ===================== */
+export const proctorAPI = {
+  getConfig: () => axiosInstance.get('/proctor/config'),
 };

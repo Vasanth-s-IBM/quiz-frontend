@@ -20,6 +20,11 @@ const Header: React.FC<HeaderProps> = ({ isAdmin = false }) => {
       <h2>Quiz System {isAdmin ? '- Admin' : ''}</h2>
       <div className="header-right">
         <span>Welcome, {user?.name}</span>
+        {!isAdmin && (
+          <button onClick={() => navigate('/profile')} className="btn-secondary">
+            My Profile
+          </button>
+        )}
         <button onClick={handleLogout} className="btn-danger">
           Logout
         </button>

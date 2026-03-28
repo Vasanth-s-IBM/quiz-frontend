@@ -13,6 +13,7 @@ import Topics from './pages/Topics';
 import Instructions from './pages/Instructions';
 import Exam from './pages/Exam';
 import Completion from './pages/Completion';
+import UserProfile from './pages/UserProfile';
 
 // Admin pages
 import AdminDashboard from './pages/AdminDashboard';
@@ -20,12 +21,13 @@ import AdminResults from './pages/AdminResults';
 import AdminUsers from './pages/AdminUsers';
 import AdminTopics from './pages/AdminTopics';
 import AdminQuestions from './pages/AdminQuestions';
+import AdminProctoringConfig from './pages/AdminProctoringConfig';
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <ToastProvider>
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Toast />
           <Routes>
             {/* ---------------- PUBLIC ROUTES ---------------- */}
@@ -69,6 +71,15 @@ const App: React.FC = () => {
               }
             />
 
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute allowedRoles={['User']}>
+                  <UserProfile />
+                </ProtectedRoute>
+              }
+            />
+
             {/* ---------------- ADMIN ROUTES ---------------- */}
             <Route
               path="/admin/dashboard"
@@ -102,6 +113,15 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={['Admin']}>
                   <AdminQuestions />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/proctoring"
+              element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <AdminProctoringConfig />
                 </ProtectedRoute>
               }
             />

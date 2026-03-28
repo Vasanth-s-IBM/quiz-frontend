@@ -11,16 +11,12 @@ const Completion: React.FC = () => {
     return null;
   }
 
-  const handleBackToTopics = () => {
-    navigate('/topics');
-  };
-
   return (
     <div className="completion-page">
       <div className="completion-card">
         <div className="success-icon">✓</div>
         <h1>Exam Completed!</h1>
-        
+
         <div className="result-box">
           <h2>Your Score</h2>
           <div className="score-display">
@@ -37,12 +33,17 @@ const Completion: React.FC = () => {
         )}
 
         <div className="message-box">
-          <p>{result.message}</p>
+          <p>🕐 Your result is <strong>under review</strong>. You will get an update shortly.</p>
         </div>
 
-        <button onClick={handleBackToTopics} className="btn-primary">
-          Back to Topics
-        </button>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button onClick={() => navigate('/profile')} className="btn-primary">
+            View My Profile
+          </button>
+          <button onClick={() => navigate('/topics')} className="btn-secondary">
+            Back to Topics
+          </button>
+        </div>
       </div>
     </div>
   );

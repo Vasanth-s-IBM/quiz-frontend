@@ -991,3 +991,382 @@ input:focus, select:focus, textarea:focus {
   justify-content: flex-end;
   gap: 10px;
 }
+
+/* ==================== USER PROFILE ==================== */
+.profile-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.profile-empty p {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.profile-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+.profile-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profile-card-header h3 {
+  color: #333;
+  font-size: 18px;
+}
+
+.profile-card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.profile-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-stat-label {
+  font-size: 12px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.profile-card-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profile-card-actions button {
+  flex: 1;
+  min-width: 120px;
+  font-size: 14px;
+  padding: 10px 14px;
+}
+
+/* ==================== STATUS BADGES ==================== */
+.cert-status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-review {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.badge-rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* ==================== PROFILE BANNERS ==================== */
+.profile-banner {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.banner-review {
+  background: #fff3cd;
+  color: #856404;
+  border-left: 4px solid #ffc107;
+}
+
+.banner-rejected {
+  background: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+/* ==================== FACE PROCTORING ==================== */
+.face-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.face-ok {
+  background: #d4edda;
+  color: #155724;
+}
+
+.face-warn {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.face-danger {
+  background: #f8d7da;
+  color: #721c24;
+  animation: pulse-danger 1s infinite;
+}
+
+.face-loading {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.face-violation-count {
+  font-weight: 700;
+}
+
+.face-alert-banner {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  color: #856404;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+@keyframes pulse-danger {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+/* ==================== CORNER CAM WIDGET ==================== */
+.cam-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  z-index: 1000;
+  border: 3px solid #4CAF50;
+  background: #000;
+  transition: border-color 0.3s;
+}
+
+.cam-widget.cam-violation {
+  border-color: #f44336;
+  animation: pulse-danger 1s infinite;
+}
+
+.cam-widget.cam-loading {
+  border-color: #aaa;
+}
+
+.cam-feed {
+  width: 100%;
+  display: block;
+  transform: scaleX(-1);   /* mirror — feels natural for selfie view */
+}
+
+.cam-label {
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  padding: 4px 6px;
+  letter-spacing: 0.3px;
+}
+
+.cam-violations {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: #f44336;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+/* ==================== PROCTORING CONFIG ==================== */
+.proctor-config-card {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.config-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  gap: 20px;
+}
+
+.config-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.config-label span {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+.config-label small {
+  color: #888;
+  font-size: 13px;
+}
+
+.config-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-size: 14px;
+}
+
+.config-input-group input {
+  width: 80px;
+  text-align: center;
+  padding: 8px;
+}
+
+/* Toggle switch */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #ccc;
+  border-radius: 26px;
+  transition: 0.3s;
+}
+
+.toggle-slider:before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.toggle input:checked + .toggle-slider {
+  background: #4CAF50;
+}
+
+.toggle input:checked + .toggle-slider:before {
+  transform: translateX(22px);
+}
+
+/* ==================== VIOLATION BADGE & TOOLTIP ==================== */
+.badge-violation {
+  background: #f8d7da;
+  color: #721c24;
+  cursor: default;
+}
+
+.violation-badge-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.violation-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2c3e50;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: nowrap;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  pointer-events: none;
+}
+
+/* Arrow */
+.violation-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #2c3e50;
+}
+
+.violation-badge-wrap:hover .violation-tooltip {
+  display: block;
+}
+
+/* Highlight flagged rows */
+.row-flagged {
+  background: #fff8f8 !important;
+}
+
+.row-flagged:hover {
+  background: #fff0f0 !important;
+}

@@ -10,6 +10,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
+  initialized: boolean;
   login: (token: string, refreshToken: string, user: User) => void;
   logout: () => void;
 }
@@ -21,7 +22,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  // 🔥 RESTORE AUTH BEFORE ROUTES LOAD
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
@@ -38,7 +38,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('token', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('user', JSON.stringify(userData));
-
     setToken(accessToken);
     setUser(userData);
   };
@@ -49,13 +48,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
-  // ⛔ DO NOT RENDER ROUTES UNTIL READY
-  if (!initialized) {
-    return null;
-  }
-
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, initialized, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { authAPI } from '../api/services';
@@ -11,9 +11,14 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { login } = useAuth();
+  const { user, token, initialized, login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+
+  // Already logged in — redirect to their dashboard
+  if (initialized && user && token) {
+    return <Navigate to={user.role?.toLowerCase() === 'admin' ? '/admin/dashboard' : '/topics'} replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

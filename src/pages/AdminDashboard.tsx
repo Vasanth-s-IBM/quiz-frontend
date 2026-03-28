@@ -102,6 +102,14 @@ const AdminDashboard: React.FC = () => {
               <span className="action-icon">❓</span>
               <span>Manage Questions</span>
             </button>
+
+            <button
+              onClick={() => navigate('/admin/proctoring')}
+              className="action-card"
+            >
+              <span className="action-icon">🎥</span>
+              <span>Proctoring Settings</span>
+            </button>
           </div>
         </div>
       </div>
