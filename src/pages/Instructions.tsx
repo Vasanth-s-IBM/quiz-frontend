@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { topicAPI } from '../api/services';
 import Loader from '../components/Loader';
+import Header from '../components/Header';
+import {
+  BookIcon, AwardIcon, ClockIcon, CheckIcon,
+  AlertTriangleIcon, ArrowLeftIcon, ArrowRightIcon, InfoIcon, ShieldIcon
+} from '../components/Icons';
 
 const Instructions: React.FC = () => {
   const { topicId } = useParams<{ topicId: string }>();
@@ -9,79 +14,69 @@ const Instructions: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTopic();
+    topicAPI.getAll()
+      .then(r => {
+        const found = r.data.find((t: any) => t.id === parseInt(topicId!));
+        if (!found) navigate('/topics'); else setTopic(found);
+      })
+      .catch(() => navigate('/topics'));
   }, []);
 
-  const fetchTopic = async () => {
-    try {
-      const response = await topicAPI.getAll();
-      const foundTopic = response.data.find((t: any) => t.id === parseInt(topicId!));
-      setTopic(foundTopic);
-    } catch (error) {
-      console.error('Error fetching topic:', error);
-    }
-  };
-
-  const handleStartExam = () => {
-    navigate(`/exam/${topicId}`);
-  };
-
-  const handleBack = () => {
-    navigate('/topics');
-  };
-
-  if (!topic) return <Loader />;
+  if (!topic) return <Loader text="Loading exam details…" />;
 
   return (
     <div className="instructions-page">
-      <div className="instructions-card">
-        <h1>Exam Instructions</h1>
-        <h2>{topic.name}</h2>
-        
-        <div className="instructions-content">
+      <Header />
+      <div className="instructions-body">
+        <div className="instructions-header">
+          <h1>Exam Instructions</h1>
+          <p>{topic.name}</p>
+        </div>
+
+        <div className="instructions-grid">
           <div className="info-box">
-            <h3>Exam Details</h3>
+            <h3><span className="icon-wrap"><InfoIcon size={14} /></span>Exam Details</h3>
             <ul>
-              <li>Number of Questions: <strong>{topic.question_count}</strong></li>
-              <li>Each Question: <strong>1 mark</strong></li>
-              <li>Total Time: <strong>45 minutes</strong></li>
-              <li>Passing Score: <strong>60%</strong></li>
+              <li><BookIcon size={14} className="list-icon" /><span>Questions: <strong>{topic.question_count}</strong></span></li>
+              <li><AwardIcon size={14} className="list-icon" /><span>Each question: <strong>1 mark</strong></span></li>
+              <li><ClockIcon size={14} className="list-icon" /><span>Total time: <strong>45 minutes</strong></span></li>
+              <li><CheckIcon size={14} className="list-icon" /><span>Passing score: <strong>60%</strong></span></li>
             </ul>
           </div>
 
           <div className="rules-box">
-            <h3>Important Rules</h3>
+            <h3><span className="icon-wrap"><ShieldIcon size={14} /></span>Important Rules</h3>
             <ul>
-              <li>✓ Exam will start in fullscreen mode</li>
-              <li>✓ Timer starts immediately when you begin</li>
-              <li>✓ One question will be displayed at a time</li>
-              <li>✓ You can navigate between questions</li>
-              <li>✓ Exam auto-submits when time ends</li>
+              <li><CheckIcon size={14} className="list-icon" /><span>Exam starts in fullscreen mode</span></li>
+              <li><CheckIcon size={14} className="list-icon" /><span>Timer begins immediately on start</span></li>
+              <li><CheckIcon size={14} className="list-icon" /><span>One question displayed at a time</span></li>
+              <li><CheckIcon size={14} className="list-icon" /><span>Navigate between questions freely</span></li>
+              <li><CheckIcon size={14} className="list-icon" /><span>Exam auto-submits when time ends</span></li>
             </ul>
           </div>
 
           <div className="warning-box">
-            <h3>⚠️ Malpractice Detection</h3>
+            <h3><span className="icon-wrap"><AlertTriangleIcon size={14} /></span>Malpractice Detection</h3>
             <ul>
-              <li>Tab switches are tracked</li>
-              <li>1st switch → Warning popup</li>
-              <li>2nd switch → Final warning</li>
-              <li>3rd switch → Auto-submit + Malpractice flag</li>
+              <li><AlertTriangleIcon size={14} className="list-icon" /><span>Tab switches are tracked</span></li>
+              <li><AlertTriangleIcon size={14} className="list-icon" /><span>1st switch — Warning popup</span></li>
+              <li><AlertTriangleIcon size={14} className="list-icon" /><span>2nd switch — Final warning</span></li>
+              <li><AlertTriangleIcon size={14} className="list-icon" /><span>3rd switch — Auto-submit + Malpractice flag</span></li>
             </ul>
           </div>
 
           <div className="completion-box">
-            <h3>After Completion</h3>
-            <p>Your score will be calculated immediately. A certificate will be emailed to you shortly after admin approval.</p>
+            <h3><span className="icon-wrap" style={{ color: 'var(--success)' }}><AwardIcon size={14} /></span>After Completion</h3>
+            <p>Your score is calculated immediately. A certificate will be issued after admin approval.</p>
           </div>
         </div>
 
         <div className="button-group">
-          <button onClick={handleBack} className="btn-secondary">
-            Back to Topics
+          <button className="btn-secondary btn-lg" onClick={() => navigate('/topics')}>
+            <ArrowLeftIcon size={16} /> Back
           </button>
-          <button onClick={handleStartExam} className="btn-success">
-            Start Exam
+          <button className="btn-success btn-lg" onClick={() => navigate(`/exam/${topicId}`)}>
+            Start Exam <ArrowRightIcon size={16} />
           </button>
         </div>
       </div>

@@ -3,57 +3,48 @@ import { useNavigate } from 'react-router-dom';
 import { userAPI } from '../api/services';
 import { useToast } from '../context/ToastContext';
 import Header from '../components/Header';
-import Loader from '../components/Loader';
+import { SkeletonGrid } from '../components/Loader';
+import {
+  AwardIcon, DownloadIcon, RefreshIcon, ClockIcon,
+  CheckIcon, XIcon, BookIcon, ArrowRightIcon
+} from '../components/Icons';
 
 interface Result {
-  id: number;
-  topic_id: number;
-  topic_name: string;
-  score: number;
-  total_marks: number;
-  percentage: number;
-  grade: string;
-  certificate_status: string;
-  certificate_issued: boolean;
+  id: number; topic_id: number; topic_name: string;
+  score: number; total_marks: number; percentage: number;
+  grade: string; certificate_status: string; certificate_issued: boolean;
   created_at: string;
 }
 
-const statusConfig: Record<string, { label: string; className: string; icon: string }> = {
-  in_review: { label: 'In Review',  className: 'status-review',    icon: '🕐' },
-  approved:  { label: 'Approved',   className: 'status-approved',  icon: '✅' },
-  rejected:  { label: 'Rejected',   className: 'status-rejected',  icon: '❌' },
+const statusConfig: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
+  in_review: { label: 'In Review', cls: 'status-review',   icon: <ClockIcon size={12} /> },
+  approved:  { label: 'Approved',  cls: 'status-approved', icon: <CheckIcon size={12} /> },
+  rejected:  { label: 'Rejected',  cls: 'status-rejected', icon: <XIcon size={12} /> },
 };
 
 const UserProfile: React.FC = () => {
-  const [results, setResults] = useState<Result[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [results, setResults]         = useState<Result[]>([]);
+  const [loading, setLoading]         = useState(true);
   const [downloading, setDownloading] = useState<number | null>(null);
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  useEffect(() => { fetchProfile(); }, []);
-
-  const fetchProfile = async () => {
-    try {
-      const res = await userAPI.getProfile();
-      setResults(res.data);
-    } catch {
-      showToast('Failed to load profile', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    userAPI.getProfile()
+      .then(r => setResults(r.data))
+      .catch(() => showToast('Failed to load results', 'error'))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleDownload = async (scoreId: number, topicName: string) => {
     setDownloading(scoreId);
     try {
       const res = await userAPI.downloadCertificate(scoreId);
       const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `certificate_${topicName.replace(/\s+/g, '_')}.pdf`;
-      link.click();
-      window.URL.revokeObjectURL(url);
+      const a = document.createElement('a');
+      a.href = url; a.download = `certificate_${topicName.replace(/\s+/g, '_')}.pdf`;
+      a.click(); window.URL.revokeObjectURL(url);
+      showToast('Certificate downloaded', 'success');
     } catch {
       showToast('Failed to download certificate', 'error');
     } finally {
@@ -61,87 +52,84 @@ const UserProfile: React.FC = () => {
     }
   };
 
-  const handleRetry = (topicId: number) => {
-    navigate(`/instructions/${topicId}`);
-  };
-
-  if (loading) return <Loader />;
-
   return (
-    <div className="topics-page">
+    <div className="page">
       <Header />
-      <div className="topics-container">
-        <h1>My Results</h1>
+      <div className="page-body">
+        <div className="page-header">
+          <div>
+            <h1>My Results</h1>
+            <p className="text-muted text-sm mt-1">Track your exam history and download certificates</p>
+          </div>
+          <button className="btn-primary" onClick={() => navigate('/topics')}>
+            Browse Topics <ArrowRightIcon size={15} />
+          </button>
+        </div>
 
-        {results.length === 0 ? (
+        {loading ? (
+          <SkeletonGrid count={4} />
+        ) : results.length === 0 ? (
           <div className="profile-empty">
+            <div className="empty-icon"><BookIcon size={48} /></div>
             <p>You haven't taken any exams yet.</p>
-            <button className="btn-primary" onClick={() => navigate('/topics')}>
-              Browse Topics
+            <button className="btn-primary btn-lg" onClick={() => navigate('/topics')}>
+              Browse Topics <ArrowRightIcon size={16} />
             </button>
           </div>
         ) : (
-          <div className="profile-results">
-            {results.map((result) => {
+          <div className="results-grid">
+            {results.map((result, i) => {
               const st = statusConfig[result.certificate_status] ?? statusConfig['in_review'];
+              const isApproved = result.certificate_status === 'approved';
+              const isRejected = result.certificate_status === 'rejected';
+              const isReview   = result.certificate_status === 'in_review';
+
               return (
-                <div key={result.id} className="profile-card">
-                  <div className="profile-card-header">
+                <div key={result.id} className="result-card" style={{ animationDelay: `${i * 0.05}s` }}>
+                  <div className="result-card-header">
                     <h3>{result.topic_name}</h3>
-                    <span className={`cert-status-badge ${st.className}`}>
-                      {st.icon} {st.label}
-                    </span>
+                    <span className={`cert-status-badge ${st.cls}`}>{st.icon} {st.label}</span>
                   </div>
 
-                  <div className="profile-card-body">
-                    {result.certificate_status !== 'in_review' && (
+                  <div className="result-card-body">
+                    {!isReview && (
                       <>
-                        <div className="profile-stat">
-                          <span className="profile-stat-label">Score</span>
-                          <span className="profile-stat-value">{result.score} / {result.total_marks}</span>
+                        <div className="result-stat">
+                          <span className="result-stat-label">Score</span>
+                          <span className="result-stat-value">{result.score} / {result.total_marks}</span>
                         </div>
-                        <div className="profile-stat">
-                          <span className="profile-stat-label">Percentage</span>
-                          <span className="profile-stat-value">{result.percentage}%</span>
+                        <div className="result-stat">
+                          <span className="result-stat-label">Percentage</span>
+                          <span className="result-stat-value">{result.percentage}%</span>
                         </div>
-                        <div className="profile-stat">
-                          <span className="profile-stat-label">Grade</span>
-                          <span className="profile-stat-value">{result.grade}</span>
+                        <div className="result-stat">
+                          <span className="result-stat-label">Grade</span>
+                          <span className="result-stat-value">{result.grade}</span>
                         </div>
                       </>
                     )}
-                    <div className="profile-stat">
-                      <span className="profile-stat-label">Date</span>
-                      <span className="profile-stat-value">
-                        {new Date(result.created_at).toLocaleDateString()}
-                      </span>
+                    <div className="result-stat">
+                      <span className="result-stat-label">Date</span>
+                      <span className="result-stat-value">{new Date(result.created_at).toLocaleDateString()}</span>
                     </div>
                   </div>
 
-                  {result.certificate_status === 'in_review' && (
-                    <div className="profile-banner banner-review">
-                      🕐 Your test is under review. You will get an update shortly.
-                    </div>
-                  )}
-                  {result.certificate_status === 'rejected' && (
-                    <div className="profile-banner banner-rejected">
-                      ❌ Your certificate request was rejected.
-                    </div>
-                  )}
+                  {isReview   && <div className="result-banner review"   role="status"><ClockIcon size={14} /> Under review — you'll get an update shortly.</div>}
+                  {isRejected && <div className="result-banner rejected" role="alert"><XIcon size={14} /> Certificate request was rejected.</div>}
 
-                  <div className="profile-card-actions">
+                  <div className="result-card-actions">
                     <button
                       className="btn-success"
-                      disabled={result.certificate_status !== 'approved' || downloading === result.id}
+                      disabled={!isApproved || downloading === result.id}
                       onClick={() => handleDownload(result.id, result.topic_name)}
+                      aria-label={`Download certificate for ${result.topic_name}`}
                     >
-                      {downloading === result.id ? 'Downloading...' : '⬇ Download Certificate'}
+                      {downloading === result.id
+                        ? <><span className="btn-spinner" /> Downloading…</>
+                        : <><DownloadIcon size={15} /> Certificate</>}
                     </button>
-                    <button
-                      className="btn-secondary"
-                      onClick={() => handleRetry(result.topic_id)}
-                    >
-                      🔄 Retry Test
+                    <button className="btn-secondary" onClick={() => navigate(`/instructions/${result.topic_id}`)}>
+                      <RefreshIcon size={15} /> Retry
                     </button>
                   </div>
                 </div>
