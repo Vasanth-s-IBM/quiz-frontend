@@ -14,7 +14,7 @@ const axiosInstance = axios.create({
 // Request interceptor – attach token
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -55,10 +55,10 @@ axiosInstance.interceptors.response.use(
       }
 
       isRefreshing = true;
-      const refreshToken = localStorage.getItem('refreshToken');
+      const refreshToken = sessionStorage.getItem('refreshToken');
 
       if (!refreshToken) {
-        localStorage.clear();
+        sessionStorage.clear();
         window.location.replace('/login');
         return new Promise(() => {});
       }
@@ -66,8 +66,8 @@ axiosInstance.interceptors.response.use(
       try {
         const { data } = await axiosInstance.post('/auth/refresh', { refresh_token: refreshToken });
 
-        localStorage.setItem('token', data.access_token);
-        localStorage.setItem('refreshToken', data.refresh_token);
+        sessionStorage.setItem('token', data.access_token);
+        sessionStorage.setItem('refreshToken', data.refresh_token);
 
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
         originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
@@ -76,7 +76,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        localStorage.clear();
+        sessionStorage.clear();
         window.location.replace('/login');
         return new Promise(() => {});
       } finally {
